@@ -1,0 +1,9 @@
+* Dev Notes
+** Generate PDFs
+*** Headless Chrome
+- headless doc: https://developers.google.com/web/updates/2017/04/headless-chrome#cli
+- chrome clis: https://cs.chromium.org/chromium/src/headless/app/headless_shell_switches.cc
+- chrome gpu bug issue: https://github.com/GoogleChrome/puppeteer/issues/1925
+- pdf options: https://stackoverflow.com/questions/46077392/additional-options-in-chrome-headless-print-to-pdf
+
+- chrome + python + selenium: https://medium.com/@pyzzled/running-headless-chrome-with-selenium-in-python-3f42d1f5ff1d
