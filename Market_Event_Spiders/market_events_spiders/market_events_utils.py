@@ -31,7 +31,12 @@ def get_filename(date_time, col):
 
   def query_event_no(date_time):
     # convert to utc time (mongodb use utc time by default)
-    return col.find({"date_time": {"$gte": date_time, "$lte": date_time}}).count()
+    return col.find({
+        "date_time": {
+            "$gte": date_time,
+            "$lte": date_time
+        }
+    }).count()
 
   no = str(query_event_no(date_time) + 1)
   return mkt_id + 'd' + date_time_str + 'n' + no + '.pdf'
@@ -52,6 +57,14 @@ def save_pdf_chrome(url, dir_filename):
 
 def save_pdf_url(url, dir_filename):
   urlretrieve(url, dir_filename)
+
+
+def save_pdf_url_or_chrome(url, dir_filename):
+  # save PDFs
+  if url.lower().endswith('.pdf'):
+    save_pdf_url(url, dir_filename)
+  else:
+    save_pdf_chrome(url, dir_filename)
 
 
 def filter_ric(string):

@@ -9,24 +9,20 @@ class AsxSpider(scrapy.Spider):
 
   # market meta config
   uptick_name = 'asx'
-  mkt_id = utils.get_mkt_id(uptick_name)
-  # todo: magic number
   tzinfo = 'Australia/Sydney'
+  # web config
+  website_url = 'https://www.asx.com.au/about/asx-market-announcements.htm'
+  root_url = 'https://www.asx.com.au'
 
   # db config
   client = MongoClient('mongodb://localhost:27017/')
   db = client['Market_Events']
   col = db[uptick_name]
 
-  # web config
-  website_url = 'https://www.asx.com.au/about/asx-market-announcements.htm'
-  root_url = 'https://www.asx.com.au'
-
-  # wget command
+  # parameters
+  mkt_id = utils.get_mkt_id(uptick_name)
   pdfs_dir = utils.PDF_DIR + uptick_name + '/'
   utils.create_pdf_dir(pdfs_dir)
-
-  # parameters
   latest_date = utils.get_latest_date_time(col)
 
   def start_requests(self):
@@ -38,7 +34,7 @@ class AsxSpider(scrapy.Spider):
     news_list = response.xpath('//tr')
     for n in news_list:
       news_col_list = n.xpath('./td')
-      try:
+      try: # news row won't have error
         date_str = news_col_list[0].xpath('text()').extract_first().strip()
         date_time = utils.create_date_time_tzinfo(
             date_str, self.tzinfo, date_formats=['%d/%m/%y'])
@@ -54,21 +50,17 @@ class AsxSpider(scrapy.Spider):
         yield {
             'mkt': self.uptick_name,
             'mkt_id': self.mkt_id,
+            'tzinfo': self.tzinfo,
             'date_time': date_time,
             'title': title,
             'url': url,
             'unique_id': filename,
-            'tzinfo': self.tzinfo,
             'error': False
         }
 
-        # save PDFs
-        if url.lower().endswith('.pdf'):
-          utils.save_pdf_url(url, self.pdfs_dir + filename)
-        else:
-          utils.save_pdf_chrome(url, self.pdfs_dir + filename)
+        utils.save_pdf_url_or_chrome(url, self.pdfs_dir + filename)
 
-      except:
+      except: # not news row, skip
         continue
 
   def closed(self, reason):
