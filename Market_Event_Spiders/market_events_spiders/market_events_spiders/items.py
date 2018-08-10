@@ -8,7 +8,7 @@
 import scrapy
 
 
-class AsxSpiderItem(scrapy.Item):
+class MarketEventsSpidersItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass

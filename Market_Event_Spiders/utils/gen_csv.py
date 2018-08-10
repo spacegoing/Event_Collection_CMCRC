@@ -22,5 +22,10 @@ csv_column_list = [
     'unique_id', 'uptick_name', 'date', 'title', 'url', 'TRIPI (1)',
     'TRIPI (2)', 'Category (1)', 'Category (2)'
 ]
+
+def remove_pdf(s):
+  return s.split('.pdf')[0]
+
 df_total = df_total.reindex(columns = csv_column_list)
+df_total['unique_id'] = df_total['unique_id'].apply(remove_pdf)
 df_total.to_csv('chli_csv_upload.csv', index=False)

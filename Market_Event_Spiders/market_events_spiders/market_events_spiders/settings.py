@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for asx_spider project
+# Scrapy settings for market_events_spiders project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,17 +9,17 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'asx_spider'
+BOT_NAME = 'market_events_spiders'
 
-SPIDER_MODULES = ['asx_spider.spiders']
-NEWSPIDER_MODULE = 'asx_spider.spiders'
+SPIDER_MODULES = ['market_events_spiders.spiders']
+NEWSPIDER_MODULE = 'market_events_spiders.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'asx_spider (+http://www.yourdomain.com)'
+#USER_AGENT = 'market_events_spiders (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+# ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'asx_spider.middlewares.AsxSpiderSpiderMiddleware': 543,
+#    'market_events_spiders.middlewares.MarketEventsSpidersSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'asx_spider.middlewares.AsxSpiderDownloaderMiddleware': 543,
+#    'market_events_spiders.middlewares.MarketEventsSpidersDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'asx_spider.pipelines.AsxSpiderPipeline': 300,
+#    'market_events_spiders.pipelines.MarketEventsSpidersPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
