@@ -50,12 +50,6 @@ class AsxSpider(scrapy.Spider):
 
         filename = utils.get_filename(date_time, self.col)
 
-        # save PDFs
-        if url.lower().endswith('.pdf'):
-          utils.save_pdf_url(url, self.pdfs_dir + filename)
-        else:
-          utils.save_pdf_chrome(url, self.pdfs_dir + filename)
-
         # insert record to mongodb
         yield {
             'mkt': self.uptick_name,
@@ -67,6 +61,13 @@ class AsxSpider(scrapy.Spider):
             'tzinfo': self.tzinfo,
             'error': False
         }
+
+        # save PDFs
+        if url.lower().endswith('.pdf'):
+          utils.save_pdf_url(url, self.pdfs_dir + filename)
+        else:
+          utils.save_pdf_chrome(url, self.pdfs_dir + filename)
+
       except:
         continue
 

@@ -58,8 +58,9 @@ class HkexSpider(scrapy.Spider):
       ).extract()[0]
       filename = utils.get_filename(date_time, self.col)
 
-      # insert record to mongodb
-      self.col.insert({
+      # Has to yield before save, otherwise parrallel spiders will get the same
+      # filename
+      yield {
           'mkt': self.uptick_name,
           'mkt_id': self.mkt_id,
           'date_time': date_time,
@@ -67,16 +68,15 @@ class HkexSpider(scrapy.Spider):
           'title': title,
           'url': url,
           'unique_id': filename,
-          'tzinfo': self.tzinfo
-      })
+          'tzinfo': self.tzinfo,
+          'error': False
+      }
 
       # save PDFs
-      if url.endswith('.pdf'):
+      if url.lower().endswith('.pdf'):
         utils.save_pdf_url(url, self.pdfs_dir + filename)
       else:
         utils.save_pdf_chrome(url, self.pdfs_dir + filename)
-
-      yield {}
 
   def closed(self, reason):
     self.logger.info('spider closed: ' + reason)

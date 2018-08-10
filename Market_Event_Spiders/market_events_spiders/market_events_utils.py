@@ -20,19 +20,21 @@ def create_pdf_dir(pdf_dir):
     os.makedirs(pdf_dir)
 
 
-def get_filename(date, col):
+def get_filename(date_time, col):
   '''
   Parameters:
+    date_time: timezone aware datetime
     col: mongodb Market_Events collection. col.name is uptick_name
   '''
-  date_str = date.strftime('%Y%m%d')
-
-  def query_event_no(date):
-    return col.find({"date": {"$gte": date, "$lte": date}}).count()
-
+  date_time_str = date_time.strftime('%Y%m%d')
   mkt_id = get_mkt_id(col.name)
-  no = str(query_event_no(date) + 1)
-  return mkt_id + 'd' + date_str + 'n' + no + '.pdf'
+
+  def query_event_no(date_time):
+    # convert to utc time (mongodb use utc time by default)
+    return col.find({"date_time": {"$gte": date_time, "$lte": date_time}}).count()
+
+  no = str(query_event_no(date_time) + 1)
+  return mkt_id + 'd' + date_time_str + 'n' + no + '.pdf'
 
 
 def get_mkt_id(uptick_name):
