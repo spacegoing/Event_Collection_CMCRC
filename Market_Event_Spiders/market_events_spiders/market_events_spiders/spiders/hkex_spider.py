@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import dateparser as dp
 from pymongo import MongoClient
 import market_events_utils as utils
 
@@ -12,7 +11,12 @@ class HkexSpider(scrapy.Spider):
   uptick_name = 'hkex'
   mkt_id = utils.get_mkt_id(uptick_name)
   # todo: magic number
-  tz_info = 'Asia/Hong_Kong'
+  tzinfo = 'Asia/Hong_Kong'
+
+  # db config
+  client = MongoClient('mongodb://localhost:27017/')
+  db = client['Market_Events']
+  col = db[uptick_name]
 
   # web config
   website_url = 'http://www.hkex.com.hk/News/News-Release?' \
@@ -23,10 +27,8 @@ class HkexSpider(scrapy.Spider):
   pdfs_dir = utils.PDF_DIR + uptick_name + '/'
   utils.create_pdf_dir(pdfs_dir)
 
-  # db config
-  client = MongoClient('mongodb://localhost:27017/')
-  db = client['Market_Events']
-  col = db[uptick_name]
+  # parameters
+  latest_date = utils.get_latest_date_time(col)
 
   def start_requests(self):
     # todo: magic number
@@ -41,7 +43,10 @@ class HkexSpider(scrapy.Spider):
       date_str = n.xpath(
           'string(div[contains(@class,"news-releases__section--date")])'
       ).extract()[0]
-      date = dp.parse(date_str)
+      date_time = utils.create_date_time_tzinfo(date_str, self.tzinfo)
+      if self.latest_date and date_time < self.latest_date:
+        break
+
       type_str = n.xpath(
           'string(.//div[contains(@class,"news-releases__section--content-type")])'
       ).extract()[0]
@@ -51,18 +56,18 @@ class HkexSpider(scrapy.Spider):
       url = self.root_url + n.xpath(
           './/a[contains(@class,"news-releases__section--content-title")]/@href'
       ).extract()[0]
-      filename = utils.get_filename(date, self.col)
+      filename = utils.get_filename(date_time, self.col)
 
       # insert record to mongodb
       self.col.insert({
           'mkt': self.uptick_name,
           'mkt_id': self.mkt_id,
-          'date_time': date,
+          'date_time': date_time,
           'type': type_str,
           'title': title,
           'url': url,
           'unique_id': filename,
-          'tz_info': self.tz_info
+          'tzinfo': self.tzinfo
       })
 
       # save PDFs
