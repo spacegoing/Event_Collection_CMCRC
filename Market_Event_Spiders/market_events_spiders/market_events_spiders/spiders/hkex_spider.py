@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import subprocess
-from urllib.request import urlretrieve
 import scrapy
 import dateparser as dp
 from pymongo import MongoClient
@@ -21,13 +19,9 @@ class HkexSpider(scrapy.Spider):
                 'sc_lang=en&Year=%d&NewsCategory=&CurrentCount=0'
   root_url = 'http://www.hkex.com.hk'
 
-  # headless chrome command
-  pdfs_dir = '/Users/spacegoing/macCodeLab-MBP2015/MQD/Automation/Event_Collection/Market_Event_Spiders/PDFs/%s'
-  chrome_path = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
-  chrome_options = ' --headless --disable-gpu --print-to-pdf=' + pdfs_dir
-  cmd = chrome_path + chrome_options + ' %s'
-
   # wget command
+  pdfs_dir = utils.PDF_DIR + uptick_name + '/'
+  utils.create_pdf_dir(pdfs_dir)
 
   # db config
   client = MongoClient('mongodb://localhost:27017/')
@@ -63,7 +57,7 @@ class HkexSpider(scrapy.Spider):
       self.col.insert({
           'mkt': self.uptick_name,
           'mkt_id': self.mkt_id,
-          'date': date,
+          'date_time': date,
           'type': type_str,
           'title': title,
           'url': url,
@@ -73,13 +67,12 @@ class HkexSpider(scrapy.Spider):
 
       # save PDFs
       if url.endswith('.pdf'):
-        urlretrieve(url, self.pdfs_dir % filename)
+        utils.save_pdf_url(url, self.pdfs_dir + filename)
       else:
-        subprocess.call(self.cmd % (filename, url), shell=True)
+        utils.save_pdf_chrome(url, self.pdfs_dir + filename)
 
       yield {}
 
   def closed(self, reason):
     self.logger.info('spider closed: ' + reason)
     self.client.close()
-
