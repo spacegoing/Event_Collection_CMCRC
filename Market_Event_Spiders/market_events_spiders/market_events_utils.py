@@ -5,6 +5,7 @@ import subprocess
 from urllib.request import urlretrieve
 import pandas as pd
 import dateparser as dp
+import pytz
 
 # todo: configurations
 PDF_DIR = '/Users/spacegoing/macCodeLab-MBP2015/MQD/Automation/Event_Collection/Market_Event_Spiders/PDFs/'
@@ -84,7 +85,7 @@ def filter_spaces(string):
   return ftr.findall(string.strip())[0]
 
 
-def get_latest_date_time(col):
+def get_latest_date_time(col, tzinfo):
   '''
   return '' if database is empty
   '''
@@ -92,6 +93,8 @@ def get_latest_date_time(col):
   latest_date = ''
   if latest_list:
     latest_date = latest_list[0]['date_time']
+    tz = pytz.timezone(tzinfo)
+    latest_date = pytz.utc.localize(latest_date, is_dst=None).astimezone(tz)
   return latest_date
 
 
