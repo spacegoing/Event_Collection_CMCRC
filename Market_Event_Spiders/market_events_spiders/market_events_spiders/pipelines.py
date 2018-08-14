@@ -15,7 +15,7 @@ class MarketEventsSpidersPipeline(object):
 
   def process_item(self, item, spider):
     if item['error']:
-      self.db[item['mkt']]['error_urls'].insert_one(item)
+      self.db[item['mkt']+'_error_urls'].insert_one(item)
     else:
       self.db[item['mkt']].insert_one(item)
     return item

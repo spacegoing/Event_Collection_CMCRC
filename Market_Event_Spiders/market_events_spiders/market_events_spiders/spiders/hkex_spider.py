@@ -25,7 +25,7 @@ class HkexSpider(scrapy.Spider):
   mkt_id = utils.get_mkt_id(uptick_name)
   pdfs_dir = utils.PDF_DIR + uptick_name + '/'
   utils.create_pdf_dir(pdfs_dir)
-  latest_date = utils.get_latest_date_time(col)
+  latest_date = utils.get_latest_date_time(col, tzinfo)
 
   def start_requests(self):
     # todo: magic number
