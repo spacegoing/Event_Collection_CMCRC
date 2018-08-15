@@ -16,9 +16,7 @@ class ExchangeParser:
     yield self.website_url
 
   def get_news_list(self, response):
-    import ipdb
-    ipdb.set_trace()
-    return response.xpath('//div[@class="news-releases__section"]')
+    return response.xpath('//ul/li[contains(@class, "dfwp-item")]')
 
   def get_news_fields(self, news_row):
     misc_fields_dict = dict()
@@ -32,26 +30,22 @@ class ExchangeParser:
 
   def get_date_time(self, news_row):
     date_str = news_row.xpath(
-        'string(div[contains(@class,"news-releases__section--date")])').extract(
-        )[0]
+        'string((.//table//table//tr)[1]/td)').extract_first().strip()
     date_time = utils.create_date_time_tzinfo(date_str, self.tzinfo)
     return date_time
 
   def get_url(self, news_row):
-    url = self.root_url + news_row.xpath(
-        './/a[contains(@class,"news-releases__section--content-title")]/@href'
-    ).extract()[0]
-    return url
+    url = news_row.xpath('(.//table)[1]//td/a/@href').extract_first().strip()
+    # todo: asx hkex quote url
+    return utils.quote_url(url)
 
   def get_title(self, news_row):
     title = news_row.xpath(
-        './/a[contains(@class,"news-releases__section--content-title")]/@title'
-    ).extract()[0]
+        'string(((.//table//tr)[2]/td)[2])').extract_first().strip()
     return title
 
   # below write customized methods
   def get_type(self, news_row):
     type_str = news_row.xpath(
-        'string(.//div[contains(@class,"news-releases__section--content-type")])'
-    ).extract()[0]
+        'string((.//table//table//tr)[2]/td)').extract_first().strip()
     return type_str
