@@ -12,6 +12,10 @@ class ExchangeParser:
   # db config
   col_name = uptick_name
 
+  def get_start_urls(self, **parameters):
+    year = parameters['year']
+    yield self.website_url % year
+
   def get_news_list(self, response):
     return response.xpath('//div[@class="news-releases__section"]')
 

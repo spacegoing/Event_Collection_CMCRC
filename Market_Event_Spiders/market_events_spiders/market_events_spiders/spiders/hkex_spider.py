@@ -22,8 +22,8 @@ class HkexSpider(scrapy.Spider):
   def start_requests(self):
     # todo: magic number
     year = 2018
-    yield scrapy.Request(
-        self.exchange.website_url % year, callback=self.parse_news_page)
+    for url in self.exchange.get_start_urls(year=year):
+      yield scrapy.Request(url, callback=self.parse_news_page)
 
   def parse_news_page(self, response):
     # from scrapy.shell import inspect_response
@@ -38,7 +38,6 @@ class HkexSpider(scrapy.Spider):
           'tzinfo': self.exchange.tzinfo,
           'error': True
       }
-
       try:  # news row won't have error
         date_time, url, title, misc_fields_dict = self.exchange.get_news_fields(
             news_row)
