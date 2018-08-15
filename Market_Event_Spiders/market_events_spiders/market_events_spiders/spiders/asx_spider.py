@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from pymongo import MongoClient
-import market_events_utils as utils
 from ExchangeClass.AsxExchange import ExchangeParser
+import Utils.GeneralUtils as utils
+import Utils.DbUtils as du
 
 
 class AsxSpider(scrapy.Spider):
@@ -12,16 +12,12 @@ class AsxSpider(scrapy.Spider):
     super().__init__()
     self.exchange = ExchangeParser()
 
-    # db config
-    self.client = MongoClient('mongodb://localhost:27017/')
-    self.col = self.client['Market_Events'][self.exchange.uptick_name]
-
     # parameters
-    self.mkt_id = utils.get_mkt_id(self.exchange.uptick_name)
+    self.mkt_id = du.get_mkt_id(self.exchange.uptick_name)
     self.pdfs_dir = utils.PDF_DIR + self.exchange.uptick_name + '/'
     utils.create_pdf_dir(self.pdfs_dir)
-    self.latest_date = utils.get_latest_date_time(self.col,
-                                                  self.exchange.tzinfo)
+    self.latest_date = du.get_latest_date_time(self.exchange.uptick_name,
+                                               self.exchange.tzinfo)
 
   def start_requests(self):
     yield scrapy.Request(
@@ -50,7 +46,7 @@ class AsxSpider(scrapy.Spider):
           break
 
         # generate file name by date and number of events on that date
-        filename = utils.get_filename(date_time, self.col)
+        filename = du.get_filename(date_time, self.exchange.uptick_name)
 
         # insert record to mongodb
         item['date_time'] = date_time
@@ -73,6 +69,7 @@ class AsxSpider(scrapy.Spider):
         yield item
         continue
 
+  # todo: multi-spider close
   def closed(self, reason):
     self.logger.info('spider closed: ' + reason)
-    self.client.close()
+    du.close_mongo_access()

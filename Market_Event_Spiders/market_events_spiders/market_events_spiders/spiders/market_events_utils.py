@@ -1,1 +1,0 @@
-/Users/spacegoing/macCodeLab-MBP2015/MQD/Automation/Event_Collection/Market_Event_Spiders/market_events_spiders/market_events_utils.py

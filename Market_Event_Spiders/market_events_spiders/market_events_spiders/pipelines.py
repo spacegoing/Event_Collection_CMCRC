@@ -4,21 +4,18 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from pymongo import MongoClient
+import Utils.DbUtils as du
 
 
 class MarketEventsSpidersPipeline(object):
 
-  def open_spider(self, spider):
-    self.client = MongoClient('mongodb://localhost:27017/')
-    self.db = self.client['Market_Events']
-
   def process_item(self, item, spider):
+    col_name = spider.exchange.col_name
     if item['error']:
-      self.db[item['mkt']+'_error_urls'].insert_one(item)
+      du.mkt_db[col_name + '_error_urls'].insert_one(item)
     else:
-      self.db[item['mkt']].insert_one(item)
+      du.mkt_db[col_name].insert_one(item)
     return item
 
   def close_spider(self, spider):
-    self.client.close()
+    du.client.close()

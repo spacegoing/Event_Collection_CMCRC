@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import market_events_utils as utils
+import Utils.GeneralUtils as utils
 
 
 class ExchangeParser:
@@ -9,6 +9,8 @@ class ExchangeParser:
   # web config
   website_url = 'https://www.asx.com.au/about/asx-market-announcements.htm'
   root_url = 'https://www.asx.com.au'
+  # db config
+  col_name = uptick_name
 
   def get_news_list(self, response):
     return response.xpath('//tr')
