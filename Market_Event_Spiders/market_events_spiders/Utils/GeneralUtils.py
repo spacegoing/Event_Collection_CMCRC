@@ -6,6 +6,7 @@ import time
 import urllib.request
 from urllib.parse import quote
 import dateparser as dp
+import validators
 
 # todo: configurations
 PDF_DIR = '/Users/spacegoing/macCodeLab-MBP2015/MQD/Automation/Event_Collection/Market_Event_Spiders/PDFs/'
@@ -75,7 +76,7 @@ def filter_spaces(string):
   keep spaces
   '''
   ftr = re.compile(r'[\S ]+')
-  return ftr.findall(string.strip())[0]
+  return ftr.findall(string.strip())
 
 
 def create_date_time_tzinfo(date_str, tzinfo, date_formats=None):
@@ -89,3 +90,6 @@ def create_date_time_tzinfo(date_str, tzinfo, date_formats=None):
       },
       date_formats=date_formats)
   return date_time
+
+def validate_url(url):
+  return validators.url(url)
