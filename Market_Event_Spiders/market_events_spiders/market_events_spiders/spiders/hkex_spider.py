@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import traceback
 import scrapy
 from ExchangeClass.HkexExchange import ExchangeParser
 import Utils.GeneralUtils as utils
@@ -68,6 +69,7 @@ class HkexSpider(scrapy.Spider):
             'news_row_html': news_row.extract(),
             'error_message': '%s: %s' % (e.__class__, str(e)),
             'row_no': i,
+            'traceback': traceback.format_exc(),
             'url': response.url
         }
         yield item
