@@ -27,6 +27,9 @@ class AsxSpider(scrapy.Spider):
     # from scrapy.shell import inspect_response
     # inspect_response(response, self)
     news_list = self.exchange.get_news_list(response)
+    if not news_list:
+      raise Exception('Error: Website Structure Has Been Changed!' +
+                      ' Maintainance Needed!')
     for i, news_row in enumerate(news_list):
       # has to assign new dict every loop
       # otherwise mongodb raises dup key (Id) error
