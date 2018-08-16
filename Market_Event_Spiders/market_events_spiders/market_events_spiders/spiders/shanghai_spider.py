@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import traceback
 import scrapy
-from ExchangeClass.NyseExchange import ExchangeParser
+from ExchangeClass.ShanghaiExchange import ExchangeParser
 import Utils.GeneralUtils as utils
 import Utils.DbUtils as du
 
 
-class NyseSpider(scrapy.Spider):
-  name = 'nyse'
+class ShanghaiSpider(scrapy.Spider):
+  name = 'shanghai'
 
   def __init__(self):
     super().__init__()
@@ -17,8 +17,9 @@ class NyseSpider(scrapy.Spider):
     self.mkt_id = du.get_mkt_id(self.exchange.uptick_name)
     self.pdfs_dir = utils.PDF_DIR + self.exchange.uptick_name + '/'
     utils.create_pdf_dir(self.pdfs_dir)
-    self.latest_date = du.get_latest_date_time(self.exchange.uptick_name,
-                                               self.exchange.tzinfo)
+    # private
+    self.latest_date = utils.create_date_time_tzinfo('31 DEC 2017',
+                                                     self.exchange.tzinfo)
 
   def start_requests(self):
     for url in self.exchange.get_start_urls():

@@ -4,31 +4,40 @@ import Utils.GeneralUtils as utils
 
 class ExchangeParser:
   # market meta config
-  uptick_name = 'nyse'
-  tzinfo = 'America/New_York'
+  uptick_name = 'shanghai'
+  tzinfo = 'Asia/Shanghai'
   # web config
-  website_url = 'https://ir.theice.com/press/press-releases/all-categories/2018?cat=*&keyword=*&ac=1'
-  root_url = 'https://ir.theice.com'
+  website_url = 'http://english.sse.com.cn/aboutsse/news/newsrelease/'
+  root_url = 'http://english.sse.com.cn'
   # todo: if get_pagination_ruls yield none
   # we do not need this
   keep_follow_pagination = True
   # db config
   col_name = uptick_name
 
+  # private
+  page_no = 2
+  pagination_template = 'http://english.sse.com.cn/aboutsse/news/newsrelease/s_index_%d.htm'
+
   def get_start_urls(self, **parameters):
     yield self.website_url
 
   def get_pagination_urls(self, response):
     meta = dict()
-    url = self.root_url + response.xpath(
-        './/div[contains(@class,"pagenav")]//li[contains(@class,"news-next")]/a/@href'
-    ).extract_first().strip()
+    url = self.pagination_template % self.page_no
+    self.page_no += 1
+    meta['page_no'] = self.page_no
     if utils.validate_url(url):
       yield url, meta
 
   def get_news_list(self, response):
-    return response.xpath(
-        '//div[contains(@class, "News")]/div[contains(@class,"RowStyle")]')
+    if response.meta.get('page_no', None):
+      news_list = response.xpath(
+          '//div[contains(@class, "sse_list_base1")]//li')
+    else:
+      news_list = response.xpath(
+          '//div[contains(@class, "sse_title_wrap_con")]//li')
+    return news_list
 
   def get_news_fields(self, news_row):
     misc_fields_dict = dict()
@@ -39,14 +48,12 @@ class ExchangeParser:
     return date_time, url, title, misc_fields_dict
 
   def get_date_time(self, news_row):
-    date_str = news_row.xpath(
-        'string(./div[contains(@class, "date")])').extract_first()
+    date_str = news_row.xpath('string(./a/span)').extract_first()
     date_str_list = utils.filter_spaces(date_str)
     date_str = ''
     for s in date_str_list:
       s = s.strip()
-      if s.lower() != 'date':
-        date_str += s
+      date_str += s + ' '
     if date_str:
       date_time = utils.create_date_time_tzinfo(date_str, self.tzinfo)
       return date_time
@@ -54,19 +61,12 @@ class ExchangeParser:
       raise Exception('Error: Date parsing error')
 
   def get_url(self, news_row):
-    url = news_row.xpath(
-        './div[contains(@class, "title")]/a/@href').extract_first().strip()
+    url = news_row.xpath('./a/@href').extract_first().strip()
     url = self.root_url + url
     return utils.quote_url(url)
 
   def get_title(self, news_row):
-    title = news_row.xpath(
-        'string(./div[contains(@class, "title")]/a)').extract_first().strip()
-    title_str_list = utils.filter_spaces(title)
-    title_str = ''
-    for t in title_str_list:
-      t.strip()
-      title_str += t
-    return title_str
+    title = news_row.xpath('string(./a/h3)').extract_first().strip()
+    return title
 
   # below write customized methods
