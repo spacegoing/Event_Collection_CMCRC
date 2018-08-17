@@ -58,6 +58,9 @@ def save_pdf_url_or_chrome(url, dir_filename):
   # save PDFs
   if url.lower().endswith('.pdf'):
     save_pdf_url(url, dir_filename)
+  elif url.lower().endswith(('.doc', '.docx', '.xls', '.xlsx', '.ppt',
+                             '.pptx')):
+    save_pdf_url(url, dir_filename)
   else:
     save_pdf_chrome(url, dir_filename)
 
