@@ -28,6 +28,7 @@ class ShenzhenSpider(scrapy.Spider):
   def parse_news_page(self, response):
     # from scrapy.shell import inspect_response
     # inspect_response(response, self)
+    stop_scrape_flag = False
     news_list = self.exchange.get_news_list(response)
     if not news_list:
       raise Exception('Error: Website Structure Has Been Changed!' +
@@ -47,6 +48,7 @@ class ShenzhenSpider(scrapy.Spider):
 
         # database has previous news and scraped news is older than database
         if self.latest_date and date_time < self.latest_date:
+          stop_scrape_flag = True
           break
 
         # generate file name by date and number of events on that date
@@ -74,7 +76,7 @@ class ShenzhenSpider(scrapy.Spider):
         yield item
         continue
 
-    if self.exchange.keep_follow_pagination:
+    if self.exchange.keep_follow_pagination and not stop_scrape_flag:
       for url, meta in self.exchange.get_pagination_urls(response):
         yield scrapy.Request(url, callback=self.parse_news_page, meta=meta)
 
