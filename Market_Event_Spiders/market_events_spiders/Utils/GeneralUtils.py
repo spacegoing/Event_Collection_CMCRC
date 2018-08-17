@@ -79,7 +79,7 @@ def filter_spaces(string):
   return ftr.findall(string.strip())
 
 
-def create_date_time_tzinfo(date_str, tzinfo, date_formats=None):
+def create_date_time_tzinfo(date_str, tzinfo, date_formats: list = None):
   if not date_formats:
     date_formats = []
   date_time = dp.parse(
@@ -90,6 +90,7 @@ def create_date_time_tzinfo(date_str, tzinfo, date_formats=None):
       },
       date_formats=date_formats)
   return date_time
+
 
 def validate_url(url):
   return validators.url(url)
