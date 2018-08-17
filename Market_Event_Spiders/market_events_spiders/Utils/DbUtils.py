@@ -21,12 +21,14 @@ def get_mkt_id(uptick_name):
   return mkt_id_str
 
 
-def get_filename(date_time, col_name):
+def get_filename(date_time, col_name, website_url=''):
   '''
   Parameters:
     date_time: timezone aware datetime
     col_name: single news source mkt should be uptick_name,
               multi sources mkt should be uptick_name_suffix
+    website_url: Exchange.website_url. for multi-web sources
+                 exchange to use
   '''
   col = mkt_db[col_name]
   date_time_str = date_time.strftime('%Y%m%d')
@@ -34,29 +36,32 @@ def get_filename(date_time, col_name):
 
   def query_event_no(date_time):
     # convert to utc time (mongodb use utc time by default)
-    return col.find({
-        "date_time": {
-            "$gte": date_time,
-            "$lte": date_time
-        }
-    }).count()
+    cond = {"date_time": {"$gte": date_time, "$lte": date_time}}
+    if website_url:
+      cond = {"$and": [cond, {"website_url": {"$eq": website_url}}]}
+
+    return col.find(cond).count()
 
   no = str(query_event_no(date_time) + 1)
   return mkt_id + 'd' + date_time_str + 'n' + no + '.pdf'
 
 
-def get_latest_date_time(col_name, tzinfo):
+def get_latest_date_time(col_name, tzinfo, website_url=''):
   '''
   Parameters:
     col_name: single news source mkt should be uptick_name,
               multi sources mkt should be uptick_name_suffix
     tzinfo: string tzinfo
-
+    website_url: Exchange.website_url. for multi-web sources
+                 exchange to use
   Return:
     '' if database is empty
   '''
   col = mkt_db[col_name]
-  latest_list = list(col.find().sort('date_time', -1).limit(1))
+  cond = dict()
+  if website_url:
+    cond = {"website_url": {"$eq": website_url}}
+  latest_list = list(col.find(cond).sort('date_time', -1).limit(1))
   latest_date = ''
   if latest_list:
     latest_date = latest_list[0]['date_time']

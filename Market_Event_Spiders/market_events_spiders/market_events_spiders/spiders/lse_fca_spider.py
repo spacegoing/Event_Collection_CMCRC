@@ -15,9 +15,11 @@ class LsefcaSpider(scrapy.Spider):
 
     # parameters
     self.mkt_id = du.get_mkt_id(self.exchange.uptick_name)
-    self.pdfs_dir = utils.PDF_DIR + self.exchange.uptick_name + '/'
+    # todo: change uptick_name to col_name
+    self.pdfs_dir = utils.PDF_DIR + self.exchange.col_name + '/'
     utils.create_pdf_dir(self.pdfs_dir)
     # private
+    # if self.exchange.is_multi_source_exchange:
     self.latest_date = utils.create_date_time_tzinfo('30 DEC 2017',
                                                      self.exchange.tzinfo)
 
@@ -52,7 +54,14 @@ class LsefcaSpider(scrapy.Spider):
           break
 
         # generate file name by date and number of events on that date
-        filename = du.get_filename(date_time, self.exchange.uptick_name)
+        # todo: change uptick_name to col_name
+        # if exchange has multi news sources
+        # assign key 'website_url' to misc_fields_dict
+        website_url = ''
+        if self.exchange.is_multi_source_exchange:
+          website_url = misc_fields_dict.get('website_url')
+        filename = du.get_filename(date_time, self.exchange.col_name,
+                                   website_url)
 
         # insert record to mongodb
         item['date_time'] = date_time

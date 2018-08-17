@@ -15,7 +15,8 @@ class ExchangeParser:
   # urljoin() therefore it is always valid
   keep_follow_pagination = True
   # db config
-  col_name = 'lse_fca'
+  col_name = 'lse'
+  is_multi_source_exchange = True
 
   # private
   page_no = 1
@@ -46,6 +47,9 @@ class ExchangeParser:
     title = self.get_title(news_row)
     # customized code
     misc_fields_dict['type'] = self.get_type(news_row)
+    # if exchange has multi news sources
+    # assign key 'website_url' to misc_fields_dict
+    misc_fields_dict['website_url'] = self.website_url
     return date_time, url, title, misc_fields_dict
 
   def get_date_time(self, news_row):
