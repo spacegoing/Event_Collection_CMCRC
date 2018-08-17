@@ -48,8 +48,10 @@ class ShenzhenSpider(scrapy.Spider):
 
         # database has previous news and scraped news is older than database
         if self.latest_date and date_time < self.latest_date:
-          stop_scrape_flag = True
-          break
+          # todo: detect disordered news list
+          # shenzhen news list has disordered news
+          # stop_scrape_flag = True
+          continue
 
         # generate file name by date and number of events on that date
         filename = du.get_filename(date_time, self.exchange.uptick_name)
