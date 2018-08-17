@@ -76,7 +76,8 @@ class TsxSpider(scrapy.Spider):
         yield item
         continue
 
-    if self.exchange.keep_follow_pagination and not stop_scrape_flag:
+    # todo: test without keep_follow_page flag
+    if not stop_scrape_flag:
       for url, meta in self.exchange.get_pagination_urls(response):
         yield scrapy.Request(url, callback=self.parse_news_page, meta=meta)
 
