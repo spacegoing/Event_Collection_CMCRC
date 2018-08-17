@@ -26,6 +26,7 @@ class ExchangeParser:
     meta = dict()
     url = self.pagination_template % self.page_no
     self.page_no += 1
+    # todo: every url yielded should be validated & quoted
     if utils.validate_url(url):
       yield url, meta
 
@@ -53,9 +54,12 @@ class ExchangeParser:
 
   def get_url(self, news_row):
     url_str = news_row.xpath('(./td)[2]/a/@href').extract_first().strip()
-    import re
-    reg = re.compile(r"\('(.*?)'\)")
-    url = self.root_url + reg.findall(url_str)[0]
+    url = url_str
+    if 'javascript' in url.lower():
+      import re
+      reg = re.compile(r"\('(.*?)'\)")
+      url = self.root_url + reg.findall(url_str)[0]
+    # todo: every url yielded should be validated & quoted
     return utils.quote_url(url)
 
   def get_title(self, news_row):
