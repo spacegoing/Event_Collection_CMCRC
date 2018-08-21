@@ -39,7 +39,7 @@ def quote_url(url):
 
 
 def save_pdf_url(url, dir_filename):
-  remaining_download_tries = 3
+  remaining_download_tries = 5
   while remaining_download_tries > 0:
     try:
       urllib.request.urlretrieve(url, dir_filename)
@@ -47,7 +47,7 @@ def save_pdf_url(url, dir_filename):
     except:
       time.sleep(0.1)
       print("error downloading " + url + " on trial no: " +
-            str(3 - remaining_download_tries))
+            str(5 - remaining_download_tries))
       remaining_download_tries = remaining_download_tries - 1
       continue
   if remaining_download_tries == 0:
