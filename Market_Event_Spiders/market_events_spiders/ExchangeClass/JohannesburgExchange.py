@@ -12,8 +12,22 @@ class ExchangeParser:
   # db config
   col_name = uptick_name
 
+  # Added
+  keep_follow_pagination = False
+  is_multi_source_exchange = False
+
+  # private
+  page_no = 1
+  pagination_template = '%d'
+
   def get_start_urls(self, **parameters):
     yield self.website_url
+
+  def get_pagination_urls(self, response):
+    meta = dict()
+    url = ''
+    if utils.validate_url(url):
+      yield url, meta
 
   def get_news_list(self, response):
     return response.xpath('//ul/li[contains(@class, "dfwp-item")]')
@@ -31,7 +45,8 @@ class ExchangeParser:
   def get_date_time(self, news_row):
     date_str = news_row.xpath(
         'string((.//table//table//tr)[1]/td)').extract_first().strip()
-    date_time = utils.create_date_time_tzinfo(date_str, self.tzinfo)
+    date_time = utils.create_date_time_tzinfo(
+        date_str, self.tzinfo, date_formats=['%d/%m/%Y'])
     return date_time
 
   def get_url(self, news_row):
