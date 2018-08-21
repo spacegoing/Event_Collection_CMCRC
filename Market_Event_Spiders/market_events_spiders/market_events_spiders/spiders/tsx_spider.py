@@ -18,8 +18,10 @@ class TsxSpider(scrapy.Spider):
     self.pdfs_dir = utils.PDF_DIR + self.exchange.uptick_name + '/'
     utils.create_pdf_dir(self.pdfs_dir)
     # private
-    self.latest_date = utils.create_date_time_tzinfo('30 DEC 2017',
-                                                     self.exchange.tzinfo)
+    self.latest_date = du.get_latest_date_time(self.exchange.uptick_name,
+                                               self.exchange.tzinfo)
+    # self.latest_date = utils.create_date_time_tzinfo('30 DEC 2017',
+    #                                                  self.exchange.tzinfo)
 
   def start_requests(self):
     for url in self.exchange.get_start_urls():
